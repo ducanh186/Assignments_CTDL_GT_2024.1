@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check if a C file name is provided
-if [ -z "$1" ]; then
+if [ -z "$1" ]; then    
     echo "Usage: ./compile.sh path/to/filename.c"
     exit 1
 fi
