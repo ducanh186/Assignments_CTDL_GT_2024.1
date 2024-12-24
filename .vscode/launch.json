@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Code_git/Assignments_CTDL_GT_2024.1/Assignment_W12",
-      "program": "c:/Code_git/Assignments_CTDL_GT_2024.1/Assignment_W12/build/Debug/outDebug",
+      "cwd": "c:/Code_git/Assignments_CTDL_GT_2024.1/Assignment_W16",
+      "program": "c:/Code_git/Assignments_CTDL_GT_2024.1/Assignment_W16/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
