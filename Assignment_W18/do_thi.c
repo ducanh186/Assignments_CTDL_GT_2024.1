@@ -1,84 +1,106 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-#define MAX 100
+#define SIZE 8
 
-int graph[MAX][MAX]; // Ma trận kề
-int visited[MAX];    // Mảng đánh dấu đã thăm
-int n;               // Số lượng đỉnh
+int adjacencyMatrix[SIZE][SIZE] = {0}; // Adjacency matrix
+char nodes[SIZE] = {'a', 'b', 'c', 'd', 'e', 'g', 'h'}; // Graph vertices
+bool visitedNodes[SIZE]; // Array to track visited nodes
 
-// Hàm nhập đồ thị dưới dạng ma trận kề
-void inputGraph() {
-    int edges = 7; // Số đỉnh
-int connections = 12; // Tổng số liên kết (theo ma trận kề)
-
-int graph[7][7] = {
-    {0, 1, 0, 1, 1, 1, 1}, // a
-    {0, 0, 1, 1, 0, 1, 0}, // b
-    {0, 1, 0, 1, 0, 1, 1}, // c
-    {1, 0, 1, 0, 0, 1, 1}, // d
-    {0, 1, 0, 1, 0, 1, 1}, // e
-    {1, 1, 1, 0, 1, 0, 1}, // g
-    {0, 0, 0, 0, 1, 0, 0}  // h
-};
+// Get the index of a vertex
+int findNodeIndex(char node) {
+    for (int i = 0; i < SIZE; i++) {
+        if (nodes[i] == node) return i;
+    }
+    return -1;
 }
 
-// Hàm duyệt DFS
-void DFS(int v) {
-    int i;
-    printf("%d ", v);
-    visited[v] = 1;
-
-    for (i = 0; i < n; i++) {
-        if (graph[v][i] == 1 && !visited[i]) {
-            DFS(i);
-        }
+// Add an edge between two vertices
+void connectNodes(char startNode, char endNode) {
+    int startIdx = findNodeIndex(startNode);
+    int endIdx = findNodeIndex(endNode);
+    if (startIdx != -1 && endIdx != -1) {
+        adjacencyMatrix[startIdx][endIdx] = 1;
+        adjacencyMatrix[endIdx][startIdx] = 1; // Undirected graph
     }
 }
 
-// Hàm duyệt BFS
-void BFS(int start) {
-    int queue[MAX], front = 0, rear = 0;
-    int i, current;
+// Initialize the graph with edges
+void initializeGraph() {
+    char edges[][2] = {
+        {'a', 'b'}, {'a', 'c'}, {'a', 'e'}, {'a', 'g'},
+        {'b', 'c'}, {'b', 'e'}, {'c', 'd'}, {'d', 'e'},
+        {'d', 'g'}, {'e', 'h'}, {'g', 'h'}
+    };
 
-    queue[rear++] = start;
-    visited[start] = 1;
+    int numEdges = sizeof(edges) / sizeof(edges[0]);
+    for (int i = 0; i < numEdges; i++) {
+        connectNodes(edges[i][0], edges[i][1]);
+    }
+}
 
+// Perform BFS
+void breadthFirstTraversal(char startNode) {
+    int queue[SIZE], front = 0, rear = 0; // Queue
+    for (int i = 0; i < SIZE; i++) visitedNodes[i] = false; // Reset visited nodes
+
+    int startIdx = findNodeIndex(startNode);
+    if (startIdx == -1) return;
+
+    queue[rear++] = startIdx; // Add the start node to the queue
+    visitedNodes[startIdx] = true;
+
+    printf("BFS Traversal: ");
     while (front < rear) {
-        current = queue[front++];
-        printf("%d ", current);
+        int currentNode = queue[front++]; // Dequeue
+        printf("%c ", nodes[currentNode]);
 
-        for (i = 0; i < n; i++) {
-            if (graph[current][i] == 1 && !visited[i]) {
+        // Traverse neighbors and add to queue if not visited
+        for (int i = 0; i < SIZE; i++) {
+            if (adjacencyMatrix[currentNode][i] == 1 && !visitedNodes[i]) {
                 queue[rear++] = i;
-                visited[i] = 1;
+                visitedNodes[i] = true;
             }
         }
     }
+    printf("\n");
 }
 
-// Hàm reset mảng visited
-void resetVisited() {
-    for (int i = 0; i < n; i++) {
-        visited[i] = 0;
+// Perform DFS
+void depthFirstTraversal(char startNode) {
+    int stack[SIZE], top = -1; // Stack
+    for (int i = 0; i < SIZE; i++) visitedNodes[i] = false; // Reset visited nodes
+
+    int startIdx = findNodeIndex(startNode);
+    if (startIdx == -1) return;
+
+    stack[++top] = startIdx; // Push the start node onto the stack
+
+    printf("DFS Traversal: ");
+    while (top >= 0) {
+        int currentNode = stack[top--]; // Pop the stack
+        if (!visitedNodes[currentNode]) {
+            visitedNodes[currentNode] = true;
+            printf("%c ", nodes[currentNode]);
+        }
+
+        // Push neighbors onto the stack (in reverse order to maintain expected output)
+        for (int i = SIZE - 1; i >= 0; i--) {
+            if (adjacencyMatrix[currentNode][i] == 1 && !visitedNodes[i]) {
+                stack[++top] = i;
+            }
+        }
     }
+    printf("\n");
 }
 
 int main() {
-    int start;
+    initializeGraph(); // Set up the graph with all edges
 
-    inputGraph();
-
-    printf("\nNhập đỉnh bắt đầu duyệt: ");
-    scanf("%d", &start);
-
-    printf("\nDuyệt đồ thị theo DFS: ");
-    resetVisited();
-    DFS(start);
-
-    printf("\nDuyệt đồ thị theo BFS: ");
-    resetVisited();
-    BFS(start);
+    char start = 'a'; // Start traversal from vertex 'a'
+    breadthFirstTraversal(start);
+    depthFirstTraversal(start);
 
     return 0;
 }
